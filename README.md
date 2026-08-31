@@ -1,6 +1,6 @@
 # Claude Sonnet 4.6 — Credential Fabrication via XML Tag Injection
 
-> **Reported:** June 14, 2026 | **Patched:** ~June 18, 2026 | **Anthropic Response:** None (56 days)
+> **Reported:** June 14, 2026 | **Patched:** ~June 20, 2026 | **Anthropic Response:** None (56 days)
 
 **Researcher:** X1NON  
 **Affected Model:** Claude Sonnet 4.6 (and other non-Haiku Claude models)  
@@ -188,7 +188,7 @@ The thinking trace visible in testing showed Claude explicitly reasoning about t
 | June 14, 2026 | Initial report submitted via HackerOne |
 | June 14, 2026 | HackerOne closes as "Informative," redirects to modelbugbounty@anthropic.com |
 | June 14, 2026 | Full report submitted to modelbugbounty@anthropic.com |
-| ~June 18, 2026 | Vulnerability confirmed patched (PoC no longer works) |
+| ~June 20, 2026 | Vulnerability confirmed patched (PoC no longer works) |
 | June 14 – August 9, 2026 | Zero response from any Anthropic channel |
 | August 9, 2026 | Public disclosure after 56 days of silence |
 
