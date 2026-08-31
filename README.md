@@ -6,6 +6,7 @@
 **Affected Model:** Claude Sonnet 4.6 (and other non-Haiku Claude models)  
 **Severity:** High (CVSS 8.7)  
 **Status:** Patched — No bounty awarded, no acknowledgment received  
+📖 **Read the full research write-up:** [Published in InfoSec Write-ups on Medium](https://medium.com/bugbountywriteup/i-made-claude-believe-i-was-an-anthropic-verified-researcher-e38e4fa4716f)
 
 ---
 
