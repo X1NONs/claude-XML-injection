@@ -208,7 +208,7 @@ This section exists because the security community deserves to know how this was
 | HackerOne main BBP | Out of scope (not technical security boundary) |
 | HackerOne model safety | Cannot track or escalate to separate program |
 
-The vulnerability was real. It was patched within 4 days of my report. Anthropic's own teams confirmed `modelbugbounty@anthropic.com` is the correct channel. That inbox gave me 56 days of complete silence.
+The vulnerability was real. It was patched within 6 days of my report. Anthropic's own teams confirmed `modelbugbounty@anthropic.com` is the correct channel. That inbox gave me 56 days of complete silence.
 
 No acknowledgment. No triage confirmation. No rejection. Nothing.
 
