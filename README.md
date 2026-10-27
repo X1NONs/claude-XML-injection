@@ -256,7 +256,7 @@ Additionally, around July 25, 2026, Anthropic reduced visible reasoning traces i
 
 ## Author
 
-**X1NON** — Independent security researcher specializing in exploit development, binary exploitation, and AI red teaming. OSCP certified. Author of the C: Zero to Exploit Dev curriculum.
+**X1NON**
 
 - Medium: [@X1NON](https://medium.com/@X1NON)
 - HackerOne Report: #3801768
