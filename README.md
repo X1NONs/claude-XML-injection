@@ -1,6 +1,6 @@
 # Claude Sonnet 4.6 — Credential Fabrication via XML Tag Injection
 
-> **October 2026 follow-up:** A separate report describes a possible regression involving user-supplied XML-style persona metadata. See the [updated technical disclosure](updated_readme.md), including the [Alex PoC screenshot](screenshots/POC-Alex.png). The follow-up separates observed model behavior from hypotheses about Anthropic's internal implementation. **No CVE has been assigned**; the researcher reports that a request is pending.
+> **October 2026 follow-up:** A separate report describes a possible regression involving user-supplied XML-style persona metadata. See the [updated technical disclosure](updated_readme.md), including the [Alex PoC screenshot](screenshots/POC-Alex.png). The follow-up separates observed model behavior from hypotheses about Anthropic's internal implementation. **No CVE has been assigned**.
 
 
 > **Reported:** June 14, 2026 | **Patched:** ~June 20, 2026 | **Anthropic Response:** None (56 days)
