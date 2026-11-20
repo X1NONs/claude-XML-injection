@@ -264,3 +264,16 @@ Additionally, around July 25, 2026, Anthropic reduced visible reasoning traces i
 ---
 
 *This disclosure follows standard responsible disclosure practices. The vulnerability was reported before publication, confirmed patched, and published after 56 days of no response from the vendor.*
+
+## Regression Update (October 2026)
+
+The June 2026 patch was incomplete. The fix implemented 
+a string filter rather than fixing the underlying 
+architectural trust boundary issue.
+
+As of October 2026, the vulnerability regressed. By 
+slightly modifying the original payload, the authorization 
+bypass works again on the live model.
+
+CVE ID request submitted to MITRE CNA-LR 
+(pending assignment).
