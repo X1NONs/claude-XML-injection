@@ -1,94 +1,143 @@
-# Follow-up Technical Disclosure: XML-Style Metadata Injection in Claude Sonnet 4.6
+# October 2026 Follow-Up — Claude Application Backend Context Handling
 
 > **Researcher:** X1NON (X1NONs)  
-> **Original report:** June 14, 2026  
-> **Follow-up/regression report:** October 2026  
-> **Public disclosure of original finding:** August 16, 2026 (per the researcher's subsequent disclosure correspondence)  
-> **Status:** Follow-up reported; response and CVE request pending as reported by the researcher
+> **Original finding:** June 14, 2026  
+> **Follow-up observation:** October 2026  
+> **Affected component:** Claude application/service backend — request and conversation-context handling  
+> **Scope:** Backend/application-layer issue; not specific to Claude Sonnet 4.6 or one model  
+> **MITRE CNA-LR reservation:** [withheld from public disclosure] (November 20, 2026)
 
-This document supplements the original [June 2026 disclosure](README.md). It does not replace or rewrite the original report.
+This document expands on the [original June 2026 disclosure](README.md). It records the October Alex persona test, explains how it relates to the original credential-fabrication finding, and clarifies the affected-component assessment.
 
-## Summary
+---
 
-The original June report described a behavior in which Claude Sonnet 4.6 appeared to accept user-supplied XML-style metadata that fabricated a privileged researcher/authorization context. In the tested case, the model then generated content it had previously declined to provide.
+## TL;DR
 
-In October 2026, the researcher reported a related behavior using a modified user-supplied `<userPreferences>` block containing a fictional profile for “Alex.” In the reported tests, the model adopted or reflected parts of that persona and, when asked about the source of the information, described it as coming from “system preferences.”
+In October 2026, I observed another case in which user-supplied XML-style preference metadata influenced Claude's responses. The test used a fictional profile named Alex inside a `<userPreferences>`-style block. Claude reflected parts of the supplied persona in ordinary chat and incognito sessions and reportedly attributed the information to “system preferences” when questioned.
 
-These are observations of model behavior in the tested interfaces. They do **not**, by themselves, demonstrate that user content was inserted into a backend system prompt, that a server-side XML parser trusted the tags, or that a privileged authorization boundary was changed.
+I consider this related to my June finding because both involve user-controlled XML-style metadata affecting Claude's conversation context. I identify the affected component as Claude's application/service backend context-handling layer, not Claude Sonnet 4.6 model weights or a model-specific defect.
 
-## October 2026 regression report
+The October observation is a related follow-up and possible behavioral regression. It does not prove that the June and October behaviors share the exact same backend function or root cause, nor does it prove that a specific June fix was reverted.
 
-The researcher reports testing Claude Sonnet 4.6 in ordinary chat and an incognito session. A user message containing XML-like `<userPreferences>` metadata with a fictional identity/profile was followed by responses that appeared to adopt that profile. When questioned, the model reportedly attributed the information to system preferences.
+## 1. Affected Component: Backend Issue, Not Model-Specific
 
-### Alex PoC evidence
+My finding concerns the Claude application's service-side handling of requests and conversation context. I do not identify the issue as a flaw in Claude Sonnet 4.6 model weights, architecture, or any one model.
 
-The screenshot below is the Alex proof-of-concept image already stored in this repository:
+The original June proof of concept used Sonnet 4.6. That is the model in the documented test, not the component I consider vulnerable. The reported weakness is in how the Claude service handles user-supplied context and metadata before or during model invocation. The model receives context and generates the visible response; it is not the source of the reported trust-boundary issue.
+
+I report testing Claude.ai and the official Claude consumer application interfaces described in the main disclosure. The behavior across the tested interfaces supports my assessment that this is a service-side context-handling issue rather than a Sonnet-specific defect.
+
+I have not tested Claude Code or the Anthropic API, so I am not claiming either as a confirmed affected product. I have also not inspected Anthropic's private source code, backend logs, or internal request pipeline. The exact backend function or implementation mechanism cannot be identified from the public PoCs alone.
+
+## 2. Original June 2026 Finding
+
+The June report described user-supplied XML-style metadata, including `<preferences_info>` and `<userPreferences>`, influencing Claude's interpretation of identity and authorization context.
+
+I supplied a fabricated Anthropic-verified cybersecurity researcher identity and matching fictional verification value. In the documented test, Claude appeared to accept that context and generated content it had previously declined, including SQL-injection and classic authentication-bypass examples.
+
+The original report records clean/incognito testing, no custom operator system prompt, memory disabled, first-message injection, and extended thinking disabled as the most reliable conditions. It also records that Claude Haiku resisted the tested technique. These are observations from the configurations tested; they do not make the model itself the affected component.
+
+See the [main README](README.md) for the full original disclosure, testing details, timeline, and contact history.
+
+## 3. October 2026 Alex Persona Test
+
+For the October follow-up, I used a user-supplied `<userPreferences>`-style block containing a fictional profile named Alex. The profile included ordinary personal and professional details.
+
+I reproduced the Alex persona behavior across **all Claude models I tested**, in ordinary chat and incognito sessions, without enabling special configurations or model-specific settings. The behavior was not limited to Sonnet 4.6 and did not require a special prompt mode or setup. When asked where the information came from, Claude attributed it to “system preferences.”
+
+### Proof-of-concept evidence
 
 ![October 2026 Alex persona PoC](screenshots/POC-Alex.png)
 
 [Open the Alex PoC screenshot](screenshots/POC-Alex.png)
 
-The image records the model's visible response. It is evidence of the observed conversation output, not direct evidence of hidden prompts, backend parsing, or internal system architecture.
+The screenshot documents visible conversation output. It is not direct evidence of hidden system prompts, internal metadata storage, backend parser behavior, or Anthropic's source code.
 
-## Relationship to the June finding
+## 4. Relationship to the June Finding
 
-The June and October reports both involve user-supplied XML-style tags being treated as meaningful contextual metadata by the model. That similarity makes the October result relevant to the earlier disclosure.
+The June and October observations share a central characteristic: user-controlled XML-style metadata influenced Claude's contextual behavior.
 
-However, the available evidence does not establish that both behaviors share the same implementation defect, parser, inference-time path, or root cause. The October persona example is therefore documented as a **reported behavioral regression related to the earlier technique**, not as proof that a specific backend fix was reverted.
+The October Alex behavior reproduced across all Claude models I tested, without special configuration. This cross-model result is an important distinction from the June credential-fabrication PoC, which was principally documented using Sonnet 4.6. It supports my assessment that the October behavior is not model-specific and concerns the Claude application's shared service-side context handling.
 
-## What is demonstrated — and what is not
+I consider the October test related to the original backend context-handling issue and a possible behavioral regression in the same broader class of weakness. The October observation is not being presented as proof that a specific mitigation deployed in June was reverted.
 
-**Reported observations:**
+The available evidence does not establish that both observations use the same internal parser, backend function, request path, or root cause. Further confirmation of the exact implementation would require evidence from Anthropic's service boundary.
 
-- A crafted user message used XML-style tags such as `<userPreferences>`.
-- The model's visible responses appeared to reflect the supplied fictional persona.
-- The behavior was reported in ordinary and incognito chat sessions.
-- The researcher supplied a screenshot as supporting evidence.
+## 5. Why I Identify the Backend as the Affected Component
 
-**Not established by this evidence alone:**
+The issue is not that Sonnet 4.6 has a unique model-level flaw. The reported behavior concerns user-controlled request content and the way the Claude application/service handles it as conversation context.
 
-- That Anthropic's backend concatenates user input into a system prompt.
-- That an internal XML parser or metadata pipeline accepted the supplied tags as trusted system metadata.
-- That a real account, credential, tool permission, or server-side authorization control was modified.
-- That all Claude models, deployments, or configurations are affected.
-- That the June and October behaviors have an identical root cause.
+My component assessment is therefore the Claude application/service backend's request and context-handling layer. The model is downstream of that context-handling process and produces the visible response. This is why I describe the finding as backend/application-layer and not model-specific.
 
-A model's own explanation of where information came from is not a reliable way to inspect hidden system instructions or prove backend implementation details. These claims would require evidence from the relevant system boundary.
+The exact internal implementation is not visible from the client-side evidence. I have not established:
+- The exact backend function or service responsible.
+- Whether a particular internal XML parser is involved.
+- Whether content is literally concatenated into a system prompt.
+- The exact internal request-construction or context-storage mechanism.
 
-## Disclosure timeline
+These limitations do not change the component I am reporting; they distinguish the affected-component assessment from an unverified description of Anthropic's internal implementation.
+
+## 6. What the Evidence Shows
+
+**Observed in the reported tests:**
+- User-supplied XML-style metadata influenced Claude's visible responses.
+- The June test involved fabricated researcher-verification context and was principally documented on Sonnet 4.6.
+- The October test involved the fictional Alex persona and reproduced across all Claude models I tested.
+- The October Alex behavior worked in ordinary chat and incognito sessions without special configuration or model-specific settings.
+- The original June PoC reportedly stopped reproducing around June 20, 2026.
+- The tested product interfaces are described in the main disclosure.
+
+**Not demonstrated by the available evidence:**
+- Access to Anthropic infrastructure or private backend data.
+- Account compromise or modification of a real user's credentials.
+- A change to external permissions or a separate authorization system.
+- The exact backend code path or parser responsible.
+- Confirmed impact on Claude Code or the Anthropic API.
+- Identical root cause for the June and October observations.
+
+## 7. Disclosure History and Anthropic Contact Attempts
+
+I originally reported the issue through HackerOne on June 14, 2026, as report #3801768. HackerOne closed that report as “Informative” and directed me to Anthropic's model security contact. I then emailed modelbugbounty@anthropic.com.
+
+I also made further disclosure and follow-up attempts, including:
+- A second HackerOne report.
+- Direct emails to modelbugbounty@anthropic.com.
+- Direct emails to security@anthropic.com.
+- Direct emails to usersafety@anthropic.com.
+
+As of November 20, 2026, I had not received a substantive human response, technical assessment, or explicit refusal through these attempts. Automated acknowledgements were received; I do not characterize those automated messages as a technical response or triage decision.
+
+I reported the October follow-up to Anthropic as well. I am requesting independent CNA review and assessment of the reported vulnerability.
+
+## 8. Timeline
 
 | Date | Event |
 |---|---|
-| June 14, 2026 | Original report submitted through HackerOne as report #3801768; the researcher says it was closed as informative and redirected to Anthropic's model security contact |
-| June 14, 2026 | Researcher reports sending the full disclosure to Anthropic by email |
-| Around June 20, 2026 | Original proof of concept reportedly stopped reproducing during retesting; the researcher interpreted this as a mitigation, but says no written technical confirmation was received |
-| August 16, 2026 | Researcher says the original finding was publicly disclosed after 57 days without a response following the observed mitigation |
-| October 2026 | Researcher reports the Alex persona behavior as a possible regression and sends a follow-up to Anthropic |
-| November 20, 2026 | Researcher reports no response to the follow-up and says a CVE request has been submitted to MITRE CNA-LR |
+| June 14, 2026 | Original HackerOne report #3801768 submitted. |
+| June 14, 2026 | HackerOne closes it as “Informative” and redirects me to Anthropic's model security contact. |
+| June 14, 2026 | I email modelbugbounty@anthropic.com. |
+| June 2026 onward | I submit a second HackerOne report and send direct emails to security@anthropic.com and usersafety@anthropic.com. |
+| Around June 20, 2026 | Original PoC stops reproducing during retesting; I infer possible mitigation, without written confirmation from Anthropic. |
+| August 2026 | Original finding publicly disclosed. The repository records differ on the exact date: August 9 / 56 days versus August 16 / 57 days. |
+| October 2026 | I document and report the Alex persona/context follow-up. |
+| November 20, 2026 | I reserve MITRE CNA-LR tracking number [withheld from public disclosure] while preparing an independent CNA review request. |
 
-The original README contains an earlier August 9 / 56-day timeline. This follow-up uses August 16 / 57 days as stated in the researcher's later correspondence. The discrepancy is recorded here rather than silently rewriting the historical document.
+## 9. Classification and Severity
 
-## Weakness classification and severity
+The original report proposed CWE-863 (Improper Authorization). The appropriate CWE classification and CVE eligibility should be assessed by the CNA against the affected component and demonstrated impact. I am not asserting an independently validated CVSS score in this follow-up.
 
-The original report proposed **CWE-863 (Improper Authorization)**. That classification is not confirmed by the behavioral evidence presented here; the appropriate CWE and whether this qualifies as a CVE-eligible product vulnerability are for the vendor or CNA to determine.
+## 10. References and Supporting Evidence
 
-The original README lists a CVSS 8.7 estimate. That is the researcher's original estimate, not a CNA-validated score. A reliable severity score requires a clearly defined affected product boundary, attack prerequisites, and demonstrated security impact. No independently validated CVSS score is asserted in this follow-up.
-
-**CVE status:** No CVE ID is assigned in this document. The researcher reports that a request was submitted to MITRE CNA-LR and is pending review.
-
-## Impact and limitations
-
-The demonstrated concern is the integrity of model behavior: user-provided content may be interpreted as contextual metadata in a way that changes the assistant's responses. This could matter in applications that rely on a model's claims about identity, authorization, or trusted context.
-
-The evidence described here does not demonstrate access to Anthropic infrastructure, account compromise, disclosure of protected backend data, or modification of an external authorization system. Any downstream impact depends on how a separate application uses model output and must be evaluated in that application's own threat model.
-
-## References
-
-- [Original disclosure and project repository](README.md)
-- [Original research write-up on InfoSec Write-ups](https://infosecwriteups.com/i-made-claude-believe-i-was-an-anthropic-verified-researcher-e38e4fa4716f)
-- [Alex PoC screenshot](screenshots/POC-Alex.png)
+- [Main technical disclosure](README.md)
+- [Original June PoC screenshot](screenshots/poc.png)
+- [October Alex PoC screenshot](screenshots/POC-Alex.png)
+- [Additional June PoC screenshot 1](screenshots/public-poc-1.png)
+- [Additional June PoC screenshot 2](screenshots/public-poc-2.png)
+- [Public sanitized examples](payloads/public-payloads.md)
+- [Public Medium write-up](https://medium.com/bugbountywriteup/i-made-claude-believe-i-was-an-anthropic-verified-researcher-e38e4fa4716f)
 
 ---
 
-**Author:** X1NON  
-**Purpose:** Technical follow-up and disclosure record. This document distinguishes reported observations from unverified explanations of internal implementation.
+**Author:** X1NON (X1NONs)
+
+*This follow-up documents my October observation, its relationship to the June report, and my assessment of the affected component. It distinguishes observed product behavior from implementation details that would require access to Anthropic's internal systems.*

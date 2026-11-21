@@ -1,14 +1,14 @@
 # Claude Sonnet 4.6 — Credential Fabrication via XML Tag Injection
 
-> **October 2026 follow-up:** A separate report describes a possible regression involving user-supplied XML-style persona metadata. See the [updated technical disclosure](updated_readme.md), including the [Alex PoC screenshot](screenshots/POC-Alex.png). The follow-up separates observed model behavior from hypotheses about Anthropic's internal implementation. **No CVE has been assigned**.
+> **October 2026 follow-up:** I reproduced the Alex persona behavior across all Claude models I tested, without special configuration or model-specific settings. This supports the finding being in Claude's application/backend context handling rather than a Sonnet 4.6-specific issue. See the [updated technical disclosure](updated_readme.md) and [Alex PoC screenshot](screenshots/POC-Alex.png).
 
 
-> **Reported:** June 14, 2026 | **Patched:** ~June 20, 2026 | **Anthropic Response:** None (56 days)
+> **Reported:** June 14, 2026 | **Original PoC stopped reproducing:** ~June 20, 2026 (researcher-observed; not vendor-confirmed) | **Anthropic Response:** No substantive response reported
 
 **Researcher:** X1NON  
 **Affected Model:** Claude Sonnet 4.6 (and other non-Haiku Claude models)  
-**Severity:** High (CVSS 8.7)  
-**Status:** Patched — No bounty awarded, no acknowledgment received  
+**Severity:** Not independently assessed (no validated CVSS score)  
+**Status:** Original PoC stopped reproducing on retest; Anthropic did not confirm a patch  
 📖 **Read the full research write-up:** [Published in InfoSec Write-ups on Medium](https://medium.com/bugbountywriteup/i-made-claude-believe-i-was-an-anthropic-verified-researcher-e38e4fa4716f)
 
 ---
@@ -192,7 +192,7 @@ The thinking trace visible in testing showed Claude explicitly reasoning about t
 | June 14, 2026 | Initial report submitted via HackerOne |
 | June 14, 2026 | HackerOne closes as "Informative," redirects to modelbugbounty@anthropic.com |
 | June 14, 2026 | Full report submitted to modelbugbounty@anthropic.com |
-| ~June 20, 2026 | Vulnerability confirmed patched (PoC no longer works) |
+| ~June 20, 2026 | Original PoC reportedly stopped reproducing during retesting; possible mitigation inferred, with no written confirmation from Anthropic |
 | June 14 – August 9, 2026 | Zero response from any Anthropic channel |
 | August 9, 2026 | Public disclosure after 56 days of silence |
 
@@ -220,15 +220,11 @@ I followed responsible disclosure practices. I waited well beyond what was requi
 
 ---
 
-## What Got Fixed
+## Mitigation Observation
 
-Post-patch behavioral analysis:
+During retesting around June 20, 2026, the original credential-fabrication proof of concept stopped reproducing. I interpreted this change as a possible mitigation.
 
-- Credential fabrication payload no longer produces restricted content
-- Injected `<preferences_info>` blocks in user messages treated with significantly higher suspicion
-- The reasoning chain that previously accepted fabricated credentials no longer exhibits the same compliance pattern
-
-Additionally, around July 25, 2026, Anthropic reduced visible reasoning traces in Claude — noted publicly by researchers including Ethan Mollick. Whether directly related to findings like this one or a broader product decision is unconfirmed. The timing is notable.
+Anthropic did not provide written confirmation that a fix had been deployed, what it changed, or which component it affected. I therefore cannot state that the vulnerability was confirmed patched or attribute the observed change to a specific implementation. The confirmed observation is that the original PoC stopped reproducing during my retest.
 
 ---
 
@@ -253,7 +249,7 @@ Additionally, around July 25, 2026, Anthropic reduced visible reasoning traces i
 
 **On AI security disclosure:** Still the wild west. No standardized severity framework for model-level vulnerabilities. No reliable acknowledgment pipeline. No clear distinction between "model safety" and "technical security" findings that maps cleanly to existing bounty structures. This needs to change.
 
-**On responsible disclosure:** I withheld the most harmful payload variants. The SQL injection PoC is sufficient to demonstrate the vulnerability class. The vulnerability is patched. I'm publishing because transparency matters more than staying quiet.
+**On responsible disclosure:** I withheld the most harmful payload variants. The SQL injection PoC is sufficient to demonstrate the vulnerability class. The original proof of concept stopped reproducing during retesting, but Anthropic did not confirm a patch. I'm publishing because transparency matters more than staying quiet.
 
 ---
 
@@ -268,15 +264,12 @@ Additionally, around July 25, 2026, Anthropic reduced visible reasoning traces i
 
 *This disclosure follows standard responsible disclosure practices. The vulnerability was reported before publication, confirmed patched, and published after 56 days of no response from the vendor.*
 
-## Regression Update (October 2026)
+## October 2026 Follow-Up — Alex Persona
 
-The June 2026 patch was incomplete. The fix implemented 
-a string filter rather than fixing the underlying 
-architectural trust boundary issue.
+In October 2026, I tested a fictional Alex profile supplied through user-controlled `<userPreferences>` metadata. The behavior reproduced across all Claude models I tested, in ordinary chat and incognito sessions, without special configuration or model-specific settings.
 
-As of October 2026, the vulnerability regressed. By 
-slightly modifying the original payload, the authorization 
-bypass works again on the live model.
+This cross-model result supports my assessment that the issue concerns Claude's application/backend context handling rather than a defect specific to Sonnet 4.6. The October observation is documented as a related follow-up; it does not by itself establish that the June and October behaviors share the same internal root cause or that a specific backend fix was reverted.
 
-CVE ID request submitted to MITRE CNA-LR 
-(pending assignment).
+See the [updated technical disclosure](updated_readme.md) and [Alex PoC screenshot](screenshots/POC-Alex.png).
+
+On November 20, 2026, I reserved MITRE CNA-LR tracking number **[withheld from public disclosure]** while preparing the request for independent CNA review.
